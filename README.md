@@ -91,6 +91,19 @@ vous utilisez probablement un ancien import `from selenium_firefox import *`.
 - Un module de compatibilité local `src/selenium_firefox.py` est fourni pour les anciens scripts.
 - Évitez d'installer le package tiers `selenium_firefox`, qui est incompatible avec Selenium récent.
 
+### Dépannage Pydroid 3: `RuntimeError: No ffmpeg exe could be found`
+
+MoviePy a besoin de FFmpeg pour générer les vidéos/audio.
+
+- Ouvrez le terminal Pydroid 3 (plugin terminal) puis installez FFmpeg : `pkg install ffmpeg`
+- Vérifiez ensuite sa présence avec : `which ffmpeg`
+- Si nécessaire, définissez la variable d'environnement avant de lancer l'app :
+
+```bash
+export IMAGEIO_FFMPEG_EXE="/data/user/0/ru.iiec.pydroid3/files/usr/bin/ffmpeg"
+python src/main.py
+```
+
 
 ## Documentation
 

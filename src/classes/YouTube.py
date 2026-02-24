@@ -29,12 +29,19 @@ if not os.getenv("IMAGEIO_FFMPEG_EXE"):
     ffmpeg_candidates = [
         shutil.which("ffmpeg"),
         "/data/user/0/ru.iiec.pydroid3/files/usr/bin/ffmpeg",
+        "/data/user/0/ru.iiec.pydroid3/files/home/bin/ffmpeg",
         "/data/data/com.termux/files/usr/bin/ffmpeg",
     ]
 
     ffmpeg_path = next((path for path in ffmpeg_candidates if path and os.path.isfile(path)), None)
     if ffmpeg_path:
         os.environ["IMAGEIO_FFMPEG_EXE"] = ffmpeg_path
+    else:
+        raise RuntimeError(
+            "FFmpeg is required by MoviePy but was not found on this device. "
+            "Install FFmpeg first (on Pydroid 3: run `pkg install ffmpeg` in the terminal plugin), "
+            "or set IMAGEIO_FFMPEG_EXE to the absolute ffmpeg binary path."
+        )
 
 from moviepy.editor import *
 from termcolor import colored
