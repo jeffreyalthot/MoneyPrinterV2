@@ -68,6 +68,21 @@ pip install -r requirements.txt
 python src/main.py
 ```
 
+## Mode local (sans API IA) + Pydroid 3
+
+Pour exécuter le projet sans dépendre d'API IA (et avec un maximum de compatibilité Pydroid 3), vous pouvez activer le mode local :
+
+1. Dans `config.json`, mettez `"offline_mode": true`.
+2. Utilisez les dépendances légères via `pip install -r requirements.pydroid.txt`.
+3. À la création d'un compte YouTube, sélectionnez `Local (hors ligne)` pour la génération d'images.
+
+En mode local :
+- Les textes (topic/script/metadata/posts) sont générés localement (sans g4f).
+- Les images sont générées localement avec Pillow (cartes texte).
+- Les sous-titres sont générés localement (sans AssemblyAI).
+- Si Coqui TTS n'est pas disponible, un audio de secours est créé automatiquement.
+
+
 ## Documentation
 
 All relevant document can be found [here](docs/).

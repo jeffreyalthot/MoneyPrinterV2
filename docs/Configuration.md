@@ -7,6 +7,7 @@ All your configurations will be in a file in the root directory, called `config.
 - `verbose`: `boolean` - If `true`, the application will print out more information.
 - `firefox_profile`: `string` - The path to your Firefox profile. This is used to use your Social Media Accounts without having to log in every time you run the application.
 - `headless`: `boolean` - If `true`, the application will run in headless mode. This means that the browser will not be visible.
+- `offline_mode`: `boolean` - If `true`, runs in local mode without AI APIs (local text/image/subtitle generation + TTS fallback).
 - `llm`: This will decide the Large Language Model MPV2 uses to generate tweets, scripts, image prompts and more. If left empty, the default model (`gpt35_turbo`) will be used. Here are your choices:
     * `gpt4`
     * `gpt35_turbo`
@@ -56,6 +57,7 @@ All your configurations will be in a file in the root directory, called `config.
   "verbose": true,
   "firefox_profile": "",
   "headless": false,
+  "offline_mode": true,
   "twitter_language": "English",
   "llm": "gpt4",
   "image_prompt_llm": "gpt35_turbo",

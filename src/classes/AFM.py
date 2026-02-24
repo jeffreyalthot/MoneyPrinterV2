@@ -1,8 +1,12 @@
-import g4f
+try:
+    import g4f
+except Exception:
+    g4f = None
 
 from status import *
 from config import *
 from constants import *
+from local_ai import local_text_response
 from .Twitter import Twitter
 from selenium_firefox import *
 from selenium import webdriver
@@ -99,18 +103,13 @@ class AffiliateMarketing:
         Returns:
             response (str): The response for the user.
         """
-        # Generate the response
+        if get_offline_mode() or g4f is None:
+            return local_text_response(prompt, niche=self.topic)
+
         response: str = g4f.ChatCompletion.create(
             model=parse_model(get_model()),
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
+            messages=[{"role": "user", "content": prompt}],
         )
-
-        # Return the response
         return response
 
     def generate_pitch(self) -> str:

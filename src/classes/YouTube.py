@@ -1,9 +1,15 @@
 import re
-import g4f
+try:
+    import g4f
+except Exception:
+    g4f = None
 import json
 import time
 import requests
-import assemblyai as aai
+try:
+    import assemblyai as aai
+except Exception:
+    aai = None
 
 from utils import *
 from cache import *
@@ -12,6 +18,7 @@ from config import *
 from status import *
 from uuid import uuid4
 from constants import *
+from local_ai import local_text_response, local_script, generate_local_image, generate_local_subtitles
 from typing import List
 from moviepy.editor import *
 from termcolor import colored
@@ -102,35 +109,15 @@ class YouTube:
         return self._language
     
     def generate_response(self, prompt: str, model: any = None) -> str:
-        """
-        Generates an LLM Response based on a prompt and the user-provided model.
+        """Generates a response, using local mode when enabled."""
+        if get_offline_mode() or g4f is None:
+            return local_text_response(prompt, niche=self.niche, language=self.language)
 
-        Args:
-            prompt (str): The prompt to use in the text generation.
-
-        Returns:
-            response (str): The generated AI Repsonse.
-        """
-        if not model:
-            return g4f.ChatCompletion.create(
-                model=parse_model(get_model()),
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-        else:
-            return g4f.ChatCompletion.create(
-                model=model,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
+        selected_model = model if model else parse_model(get_model())
+        return g4f.ChatCompletion.create(
+            model=selected_model,
+            messages=[{"role": "user", "content": prompt}],
+        )
 
     def generate_topic(self) -> str:
         """
@@ -178,9 +165,11 @@ class YouTube:
         Subject: {self.subject}
         Language: {self.language}
         """
-        completion = self.generate_response(prompt)
+        if get_offline_mode():
+            completion = local_script(self.subject, get_script_sentence_length(), self.language)
+        else:
+            completion = self.generate_response(prompt)
 
-        # Apply regex to remove *
         completion = re.sub(r"\*", "", completion)
         
         if not completion:
@@ -392,6 +381,11 @@ class YouTube:
                 warning("Failed to generate image. The response was not a PNG image.")
             return None
 
+    def generate_image_local(self, prompt: str) -> str:
+        image_path = generate_local_image(prompt)
+        self.images.append(image_path)
+        return image_path
+
     def generate_image(self, prompt: str) -> str:
         """
         Generates an AI Image based on the given prompt.
@@ -414,15 +408,18 @@ class YouTube:
             error("Account configuration not found")
             return None
 
-        # Check if using G4F or Cloudflare
+        # Local-first mode for offline/Pydroid usage
+        if get_offline_mode() or account_config.get("image_generation") == "local":
+            return self.generate_image_local(prompt)
+
         if account_config.get("use_g4f", False):
             return self.generate_image_g4f(prompt)
-        else:
-            worker_url = account_config.get("worker_url")
-            if not worker_url:
-                error("Cloudflare worker URL not configured for this account")
-                return None
-            return self.generate_image_cloudflare(prompt, worker_url)
+
+        worker_url = account_config.get("worker_url")
+        if not worker_url:
+            warning("Cloudflare worker URL missing, fallback to local image generation.")
+            return self.generate_image_local(prompt)
+        return self.generate_image_cloudflare(prompt, worker_url)
 
     def generate_script_to_speech(self, tts_instance: TTS) -> str:
         """
@@ -486,14 +483,16 @@ class YouTube:
         Returns:
             path (str): The path to the generated SRT File.
         """
-        # Turn the video into audio
+        srt_path = os.path.join(ROOT_DIR, ".mp", str(uuid4()) + ".srt")
+
+        if get_offline_mode() or aai is None or not get_assemblyai_api_key():
+            return generate_local_subtitles(self.script, srt_path)
+
         aai.settings.api_key = get_assemblyai_api_key()
         config = aai.TranscriptionConfig()
         transcriber = aai.Transcriber(config=config)
         transcript = transcriber.transcribe(audio_path)
         subtitles = transcript.export_subtitles_srt()
-
-        srt_path = os.path.join(ROOT_DIR, ".mp", str(uuid4()) + ".srt")
 
         with open(srt_path, "w") as file:
             file.write(subtitles)

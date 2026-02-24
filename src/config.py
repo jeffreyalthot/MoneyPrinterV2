@@ -69,6 +69,18 @@ def get_headless() -> bool:
     with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
         return json.load(file)["headless"]
 
+
+
+def get_offline_mode() -> bool:
+    """
+    Active un mode local sans API IA ni services cloud.
+
+    Returns:
+        bool: True si le mode local est activé.
+    """
+    with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
+        return json.load(file).get("offline_mode", False)
+
 def get_model() -> str:
     """
     Gets the model from the config file.

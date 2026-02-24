@@ -83,25 +83,29 @@ def main():
                 
                 # Add image generation options
                 info("\n============ IMAGE GENERATION ============", False)
-                print(colored(" 1. G4F (SDXL Turbo)", "cyan"))
-                print(colored(" 2. Cloudflare Worker", "cyan"))
+                print(colored(" 1. Local (hors ligne, recommandé Pydroid)", "cyan"))
+                print(colored(" 2. G4F (nécessite internet)", "cyan"))
+                print(colored(" 3. Cloudflare Worker", "cyan"))
                 info("=======================================", False)
-                print(colored("\nRecommendation: If you're unsure, select G4F (Option 1) as there's no additional setup", "yellow"))
+                print(colored("\nRecommendation: pour Pydroid 3 et sans API IA, choisissez Local (Option 1)", "yellow"))
                 info("=======================================\n", False)
                 
-                image_gen_choice = question(" => Select image generation method (1/2): ")
+                image_gen_choice = question(" => Select image generation method (1/2/3): ")
                 
+                image_generation = "local" if image_gen_choice == "1" else ("g4f" if image_gen_choice == "2" else "cloudflare")
+
                 account_data = {
                     "id": generated_uuid,
                     "nickname": nickname,
                     "firefox_profile": fp_profile,
                     "niche": niche,
                     "language": language,
-                    "use_g4f": image_gen_choice == "1",
+                    "image_generation": image_generation,
+                    "use_g4f": image_generation == "g4f",
                     "videos": []
                 }
-                
-                if image_gen_choice == "2":
+
+                if image_generation == "cloudflare":
                     worker_url = question(" => Enter your Cloudflare worker URL for image generation: ")
                     account_data["worker_url"] = worker_url
 

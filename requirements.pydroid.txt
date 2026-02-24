@@ -1,0 +1,8 @@
+termcolor
+schedule
+prettytable
+moviepy
+Pillow==9.5.0
+srt_equalizer
+platformdirs
+requests
