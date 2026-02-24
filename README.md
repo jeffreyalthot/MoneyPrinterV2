@@ -93,11 +93,12 @@ vous utilisez probablement un ancien import `from selenium_firefox import *`.
 
 ### Dépannage Pydroid 3: `RuntimeError: No ffmpeg exe could be found`
 
-MoviePy a besoin de FFmpeg pour générer les vidéos/audio.
+Deux options sont possibles :
 
-- Ouvrez le terminal Pydroid 3 (plugin terminal) puis installez FFmpeg : `pkg install ffmpeg`
-- Vérifiez ensuite sa présence avec : `which ffmpeg`
-- Si nécessaire, définissez la variable d'environnement avant de lancer l'app :
+- **Mode vidéo complet (MP4 + audio)**: installez FFmpeg (`pkg install ffmpeg`) puis vérifiez avec `which ffmpeg`.
+- **Mode sans binaire externe**: activez `"binary_free_mode": true` dans `config.json`. Le rendu se fait alors en **GIF** (sans piste audio), sans FFmpeg/ImageMagick.
+
+Si vous restez en mode vidéo complet et que FFmpeg n'est pas détecté, vous pouvez forcer le chemin :
 
 ```bash
 export IMAGEIO_FFMPEG_EXE="/data/user/0/ru.iiec.pydroid3/files/usr/bin/ffmpeg"

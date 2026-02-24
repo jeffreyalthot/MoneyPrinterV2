@@ -81,6 +81,16 @@ def get_offline_mode() -> bool:
     with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
         return json.load(file).get("offline_mode", False)
 
+def get_binary_free_mode() -> bool:
+    """
+    Active un mode qui évite les binaires externes (FFmpeg/ImageMagick).
+
+    Returns:
+        bool: True si le mode sans binaire est activé.
+    """
+    with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
+        return json.load(file).get("binary_free_mode", False)
+
 def get_model() -> str:
     """
     Gets the model from the config file.
