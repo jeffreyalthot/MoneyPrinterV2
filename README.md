@@ -91,19 +91,13 @@ vous utilisez probablement un ancien import `from selenium_firefox import *`.
 - Un module de compatibilité local `src/selenium_firefox.py` est fourni pour les anciens scripts.
 - Évitez d'installer le package tiers `selenium_firefox`, qui est incompatible avec Selenium récent.
 
-### Dépannage Pydroid 3: `RuntimeError: No ffmpeg exe could be found`
+### Dépannage Pydroid 3: rendu vidéo sans FFmpeg système
 
-Deux options sont possibles :
+Le projet utilise maintenant `imageio-ffmpeg`, qui fournit un binaire FFmpeg embarqué pour MoviePy.
+Vous n'avez donc plus besoin d'installer FFmpeg manuellement avec `pkg install ffmpeg` pour le mode MP4.
 
-- **Mode vidéo complet (MP4 + audio)**: installez FFmpeg (`pkg install ffmpeg`) puis vérifiez avec `which ffmpeg`.
-- **Mode sans binaire externe**: activez `"binary_free_mode": true` dans `config.json`. Le rendu se fait alors en **GIF** (sans piste audio), sans FFmpeg/ImageMagick.
-
-Si vous restez en mode vidéo complet et que FFmpeg n'est pas détecté, vous pouvez forcer le chemin :
-
-```bash
-export IMAGEIO_FFMPEG_EXE="/data/user/0/ru.iiec.pydroid3/files/usr/bin/ffmpeg"
-python src/main.py
-```
+- **Mode vidéo complet (MP4 + audio)**: installez les dépendances Python (incluant `imageio-ffmpeg`).
+- **Mode sans binaire externe**: activez `"binary_free_mode": true` dans `config.json`. Le rendu se fait alors en **GIF** (sans piste audio).
 
 
 ## Documentation
