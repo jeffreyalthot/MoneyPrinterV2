@@ -609,14 +609,22 @@ class YouTube:
                     "yellow",
                 )
             )
-        random_song_clip = AudioFileClip(random_song).set_fps(44100)
+        audio_layers = [tts_clip.set_fps(44100)]
+        if random_song:
+            random_song_clip = AudioFileClip(random_song).set_fps(44100)
+            # Turn down volume
+            random_song_clip = random_song_clip.fx(afx.volumex, 0.1)
+            audio_layers.append(random_song_clip)
+        else:
+            print(
+                colored(
+                    "[!] No background music found in Songs/. "
+                    "Continuing with voice-over audio only.",
+                    "yellow",
+                )
+            )
 
-        # Turn down volume
-        random_song_clip = random_song_clip.fx(afx.volumex, 0.1)
-        comp_audio = CompositeAudioClip([
-            tts_clip.set_fps(44100),
-            random_song_clip
-        ])
+        comp_audio = CompositeAudioClip(audio_layers)
 
         final_clip = final_clip.set_audio(comp_audio)
         final_clip = final_clip.set_duration(tts_clip.duration)

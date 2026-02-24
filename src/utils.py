@@ -113,23 +113,23 @@ def fetch_songs() -> None:
     except Exception as e:
         error(f"Error occurred while fetching songs: {str(e)}")
 
-def choose_random_song() -> str:
+def choose_random_song() -> str | None:
     """
     Chooses a random song from the songs/ directory.
 
     Returns:
         str: The path to the chosen song.
     """
-    try:
-        songs_dir = os.path.join(ROOT_DIR, "Songs")
-        songs = _get_audio_files(songs_dir)
-        if not songs:
-            raise FileNotFoundError(
-                "No supported audio files found in Songs/. "
-                "Please run setup again or add audio files manually."
-            )
-        song = random.choice(songs)
-        success(f" => Chose song: {song}")
-        return os.path.join(songs_dir, song)
-    except Exception as e:
-        error(f"Error occurred while choosing random song: {str(e)}")
+    songs_dir = os.path.join(ROOT_DIR, "Songs")
+    songs = _get_audio_files(songs_dir)
+    if not songs:
+        error(
+            "Error occurred while choosing random song: "
+            "No supported audio files found in Songs/. "
+            "Please run setup again or add audio files manually."
+        )
+        return None
+
+    song = random.choice(songs)
+    success(f" => Chose song: {song}")
+    return os.path.join(songs_dir, song)
