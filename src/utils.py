@@ -7,6 +7,25 @@ import platform
 from status import *
 from config import *
 
+AUDIO_EXTENSIONS = {
+    ".mp3",
+    ".wav",
+    ".m4a",
+    ".aac",
+    ".ogg",
+    ".flac",
+}
+
+
+def _get_audio_files(songs_dir: str) -> list[str]:
+    """Returns all playable audio files inside songs_dir."""
+    return [
+        file_name
+        for file_name in os.listdir(songs_dir)
+        if os.path.isfile(os.path.join(songs_dir, file_name))
+        and os.path.splitext(file_name)[1].lower() in AUDIO_EXTENSIONS
+    ]
+
 def close_running_selenium_instances() -> None:
     """
     Closes any running Selenium instances.
@@ -71,7 +90,7 @@ def fetch_songs() -> None:
             os.mkdir(files_dir)
             if get_verbose():
                 info(f" => Created directory: {files_dir}")
-        else:
+        elif _get_audio_files(files_dir):
             # Skip if songs are already downloaded
             return
 
@@ -102,9 +121,15 @@ def choose_random_song() -> str:
         str: The path to the chosen song.
     """
     try:
-        songs = os.listdir(os.path.join(ROOT_DIR, "Songs"))
+        songs_dir = os.path.join(ROOT_DIR, "Songs")
+        songs = _get_audio_files(songs_dir)
+        if not songs:
+            raise FileNotFoundError(
+                "No supported audio files found in Songs/. "
+                "Please run setup again or add audio files manually."
+            )
         song = random.choice(songs)
         success(f" => Chose song: {song}")
-        return os.path.join(ROOT_DIR, "Songs", song)
+        return os.path.join(songs_dir, song)
     except Exception as e:
         error(f"Error occurred while choosing random song: {str(e)}")
