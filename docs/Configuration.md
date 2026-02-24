@@ -8,6 +8,7 @@ All your configurations will be in a file in the root directory, called `config.
 - `firefox_profile`: `string` - The path to your Firefox profile. This is used to use your Social Media Accounts without having to log in every time you run the application.
 - `headless`: `boolean` - If `true`, the application will run in headless mode. This means that the browser will not be visible.
 - `offline_mode`: `boolean` - If `true`, runs in local mode without AI APIs (local text/image/subtitle generation + TTS fallback).
+- `binary_free_mode`: `boolean` - If `true`, avoids external binaries (FFmpeg/ImageMagick) and exports a GIF slideshow (no audio track).
 - `llm`: This will decide the Large Language Model MPV2 uses to generate tweets, scripts, image prompts and more. If left empty, the default model (`gpt35_turbo`) will be used. Here are your choices:
     * `gpt4`
     * `gpt35_turbo`
@@ -58,6 +59,7 @@ All your configurations will be in a file in the root directory, called `config.
   "firefox_profile": "",
   "headless": false,
   "offline_mode": true,
+  "binary_free_mode": false,
   "twitter_language": "English",
   "llm": "gpt4",
   "image_prompt_llm": "gpt35_turbo",
@@ -78,6 +80,7 @@ All your configurations will be in a file in the root directory, called `config.
   "outreach_message_body_file": "outreach_message.html",
   "assembly_ai_api_key": "",
   "font": "bold_font.ttf",
-  "imagemagick_path": "C:\\Program Files\\ImageMagick-7.1.0-Q16\\magick.exe"
+  "imagemagick_path": "C:\\Program Files\\ImageMagick-7.1.0-Q16\\magick.exe",
+  "binary_free_mode": false
 }
 ```

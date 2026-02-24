@@ -1,6 +1,7 @@
 import re
 import os
 import shutil
+import math
 try:
     import g4f
 except Exception:
@@ -22,6 +23,7 @@ from uuid import uuid4
 from constants import *
 from local_ai import local_text_response, local_script, generate_local_image, generate_local_subtitles
 from typing import List, Optional
+from PIL import Image, ImageOps
 
 def resolve_ffmpeg_path() -> Optional[str]:
     """Resolve FFmpeg path for environments where PATH lookup is unreliable."""
@@ -47,6 +49,14 @@ def ensure_ffmpeg_available() -> str:
 
     os.environ["IMAGEIO_FFMPEG_EXE"] = ffmpeg_path
     return ffmpeg_path
+
+
+def image_to_vertical_frame(image_path: str, size=(1080, 1920)) -> Image.Image:
+    """Center-crop an image to a 9:16 frame and resize it."""
+    frame_w, frame_h = size
+    image = Image.open(image_path).convert("RGB")
+    cropped = ImageOps.fit(image, (frame_w, frame_h), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+    return cropped
 
 
 from moviepy.editor import *
@@ -534,8 +544,12 @@ class YouTube:
         Returns:
             path (str): The path to the generated MP4 File.
         """
+        ffmpeg_path = resolve_ffmpeg_path()
+        if get_binary_free_mode() or not ffmpeg_path:
+            return self.combine_binary_free()
+
+        os.environ["IMAGEIO_FFMPEG_EXE"] = ensure_ffmpeg_available()
         combined_image_path = os.path.join(ROOT_DIR, ".mp", str(uuid4()) + ".mp4")
-        ensure_ffmpeg_available()
         threads = get_threads()
         tts_clip = AudioFileClip(self.tts_path)
         max_duration = tts_clip.duration
@@ -621,6 +635,36 @@ class YouTube:
 
         success(f"Wrote Video to \"{combined_image_path}\"")
 
+        return combined_image_path
+
+    def combine_binary_free(self) -> str:
+        """
+        Génère une animation GIF sans dépendre de binaires externes (FFmpeg/ImageMagick).
+        """
+        combined_image_path = os.path.join(ROOT_DIR, ".mp", str(uuid4()) + ".gif")
+
+        if get_verbose():
+            info(" => Binary-free mode enabled: generating GIF slideshow (no audio track).")
+
+        frame_duration_ms = 1200
+        total_duration_s = max(8, len(self.script.split(".")) * 2)
+        total_frames = max(1, math.ceil((total_duration_s * 1000) / frame_duration_ms))
+
+        frames: List[Image.Image] = []
+        for idx in range(total_frames):
+            image_path = self.images[idx % len(self.images)]
+            frames.append(image_to_vertical_frame(image_path))
+
+        frames[0].save(
+            combined_image_path,
+            save_all=True,
+            append_images=frames[1:],
+            optimize=True,
+            duration=frame_duration_ms,
+            loop=0,
+        )
+
+        success(f"Wrote Binary-Free Video to \"{combined_image_path}\"")
         return combined_image_path
 
     def generate_video(self, tts_instance: TTS) -> str:
