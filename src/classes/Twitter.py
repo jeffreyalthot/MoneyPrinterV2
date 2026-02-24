@@ -1,5 +1,8 @@
 import re
-import g4f
+try:
+    import g4f
+except Exception:
+    g4f = None
 import sys
 import time
 
@@ -7,6 +10,7 @@ from cache import *
 from config import *
 from status import *
 from constants import *
+from local_ai import local_text_response
 from typing import List
 from datetime import datetime
 from termcolor import colored
@@ -175,15 +179,22 @@ class Twitter:
         Returns:
             post (str): The post
         """
-        completion = g4f.ChatCompletion.create(
-            model=parse_model(get_model()),
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"Generate a Twitter post about: {self.topic} in {get_twitter_language()}. The Limit is 2 sentences. Choose a specific sub-topic of the provided topic."
-                }
-            ]
-        )
+        if get_offline_mode() or g4f is None:
+            completion = local_text_response(
+                f"Generate a Twitter post about: {self.topic}",
+                niche=self.topic,
+                language=get_twitter_language(),
+            )
+        else:
+            completion = g4f.ChatCompletion.create(
+                model=parse_model(get_model()),
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"Generate a Twitter post about: {self.topic} in {get_twitter_language()}. The Limit is 2 sentences. Choose a specific sub-topic of the provided topic."
+                    }
+                ]
+            )
 
         if get_verbose():
             info("Generating a post...")
