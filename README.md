@@ -82,6 +82,44 @@ En mode local :
 - Les sous-titres sont générés localement (sans AssemblyAI).
 - Si Coqui TTS n'est pas disponible, un audio de secours est créé automatiquement.
 
+
+### Dépannage Windows: `ModuleNotFoundError: No module named moviepy.editor`
+
+Sur Windows, cette erreur arrive souvent avec `moviepy>=2` (où `moviepy.editor` n'est plus exposé comme avant).
+
+1. Réinstallez les dépendances du projet:
+   ```bash
+   pip uninstall -y moviepy
+   pip install -r requirements.txt
+   ```
+2. Vérifiez la version:
+   ```bash
+   python -c "import moviepy; print(moviepy.__version__)"
+   ```
+   Vous devez être en branche `1.x` avec cette base de code.
+
+### IA locale légère (RAM ~1GB) avec modèle Hugging Face
+
+Le projet supporte maintenant un provider local `hf_transformers` en plus du mode template.
+
+1. Téléchargez un petit modèle (par défaut `distilgpt2`):
+   ```bash
+   python scripts/download_local_models.py --model-id distilgpt2 --output-dir models/distilgpt2
+   ```
+2. Dans `config.json`:
+   ```json
+   {
+     "offline_mode": true,
+     "local_ai_provider": "hf_transformers",
+     "local_hf_model_id": "distilgpt2",
+     "local_hf_model_dir": "models/distilgpt2"
+   }
+   ```
+3. Si la machine est trop limitée, repassez à:
+   ```json
+   { "local_ai_provider": "template" }
+   ```
+
 ### Dépannage Pydroid 3: `ModuleNotFoundError ... firefox_binary`
 
 Si vous voyez l'erreur `No module named 'selenium.webdriver.firefox.firefox_binary'`,

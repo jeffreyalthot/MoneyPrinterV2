@@ -91,6 +91,43 @@ def get_binary_free_mode() -> bool:
     with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
         return json.load(file).get("binary_free_mode", False)
 
+
+
+def get_local_ai_provider() -> str:
+    """
+    Retourne le provider IA local (template|hf_transformers).
+
+    Returns:
+        str: provider IA local.
+    """
+    with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
+        return json.load(file).get("local_ai_provider", "template")
+
+def get_local_hf_model_id() -> str:
+    """
+    Retourne l'identifiant du modèle Hugging Face local.
+
+    Returns:
+        str: model id HF.
+    """
+    with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
+        return json.load(file).get("local_hf_model_id", "distilgpt2")
+
+def get_local_hf_model_dir() -> str:
+    """
+    Retourne le chemin local du modèle Hugging Face.
+
+    Returns:
+        str: chemin absolu du dossier modèle.
+    """
+    with open(os.path.join(ROOT_DIR, "config.json"), "r") as file:
+        model_dir = json.load(file).get("local_hf_model_dir", os.path.join(ROOT_DIR, "models", "distilgpt2"))
+
+    if os.path.isabs(model_dir):
+        return model_dir
+
+    return os.path.join(ROOT_DIR, model_dir)
+
 def get_model() -> str:
     """
     Gets the model from the config file.

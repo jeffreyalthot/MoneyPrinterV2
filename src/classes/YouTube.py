@@ -45,9 +45,9 @@ def image_to_vertical_frame(image_path: str, size=(1080, 1920)) -> Image.Image:
     return cropped
 
 
-from moviepy.editor import *
 from termcolor import colored
 from selenium import webdriver
+from moviepy.editor import AudioFileClip, TextClip, ImageClip, concatenate_videoclips, CompositeAudioClip, CompositeVideoClip, afx
 from moviepy.video.fx.all import crop
 from moviepy.config import change_settings
 from selenium.webdriver.common.by import By
