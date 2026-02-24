@@ -22,7 +22,6 @@ from local_ai import local_text_response, local_script, generate_local_image, ge
 from typing import List
 from moviepy.editor import *
 from termcolor import colored
-from selenium_firefox import *
 from selenium import webdriver
 from moviepy.video.fx.all import crop
 from moviepy.config import change_settings

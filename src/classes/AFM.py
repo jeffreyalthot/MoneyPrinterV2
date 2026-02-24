@@ -8,7 +8,6 @@ from config import *
 from constants import *
 from local_ai import local_text_response
 from .Twitter import Twitter
-from selenium_firefox import *
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service

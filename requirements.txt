@@ -4,7 +4,6 @@ schedule
 TTS
 prettytable
 webdriver_manager
-selenium_firefox
 selenium
 g4f
 moviepy
