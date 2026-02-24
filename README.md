@@ -82,6 +82,15 @@ En mode local :
 - Les sous-titres sont générés localement (sans AssemblyAI).
 - Si Coqui TTS n'est pas disponible, un audio de secours est créé automatiquement.
 
+### Dépannage Pydroid 3: `ModuleNotFoundError ... firefox_binary`
+
+Si vous voyez l'erreur `No module named 'selenium.webdriver.firefox.firefox_binary'`,
+vous utilisez probablement un ancien import `from selenium_firefox import *`.
+
+- Sur cette base de code, utilisez Selenium natif (`from selenium import webdriver`, etc.).
+- Un module de compatibilité local `src/selenium_firefox.py` est fourni pour les anciens scripts.
+- Évitez d'installer le package tiers `selenium_firefox`, qui est incompatible avec Selenium récent.
+
 
 ## Documentation
 
