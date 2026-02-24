@@ -14,7 +14,6 @@ from local_ai import local_text_response
 from typing import List
 from datetime import datetime
 from termcolor import colored
-from selenium_firefox import *
 from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.common import keys
