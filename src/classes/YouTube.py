@@ -49,10 +49,6 @@ def ensure_ffmpeg_available() -> str:
     return ffmpeg_path
 
 
-# Ensure FFmpeg is configured before importing MoviePy.
-# This provides a clearer error message on constrained environments like Pydroid.
-ensure_ffmpeg_available()
-
 from moviepy.editor import *
 from termcolor import colored
 from selenium import webdriver
