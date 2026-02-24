@@ -49,10 +49,9 @@ def ensure_ffmpeg_available() -> str:
     return ffmpeg_path
 
 
-# Best-effort FFmpeg setup at import time.
-resolve_path = resolve_ffmpeg_path()
-if resolve_path:
-    os.environ["IMAGEIO_FFMPEG_EXE"] = resolve_path
+# Ensure FFmpeg is configured before importing MoviePy.
+# This provides a clearer error message on constrained environments like Pydroid.
+ensure_ffmpeg_available()
 
 from moviepy.editor import *
 from termcolor import colored
