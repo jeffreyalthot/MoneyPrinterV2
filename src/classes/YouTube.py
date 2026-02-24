@@ -1,4 +1,6 @@
 import re
+import os
+import shutil
 try:
     import g4f
 except Exception:
@@ -20,6 +22,20 @@ from uuid import uuid4
 from constants import *
 from local_ai import local_text_response, local_script, generate_local_image, generate_local_subtitles
 from typing import List
+
+# Ensure MoviePy can resolve FFmpeg on environments where PATH lookup is unreliable
+# (e.g., some Android/Pydroid setups).
+if not os.getenv("IMAGEIO_FFMPEG_EXE"):
+    ffmpeg_candidates = [
+        shutil.which("ffmpeg"),
+        "/data/user/0/ru.iiec.pydroid3/files/usr/bin/ffmpeg",
+        "/data/data/com.termux/files/usr/bin/ffmpeg",
+    ]
+
+    ffmpeg_path = next((path for path in ffmpeg_candidates if path and os.path.isfile(path)), None)
+    if ffmpeg_path:
+        os.environ["IMAGEIO_FFMPEG_EXE"] = ffmpeg_path
+
 from moviepy.editor import *
 from termcolor import colored
 from selenium import webdriver
