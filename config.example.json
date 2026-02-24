@@ -25,5 +25,8 @@
   "imagemagick_path": "Path to magick.exe or on linux/macOS just /usr/bin/convert",
   "script_sentence_length": 4,
   "offline_mode": true,
-  "binary_free_mode": false
+  "binary_free_mode": false,
+  "local_ai_provider": "template",
+  "local_hf_model_id": "distilgpt2",
+  "local_hf_model_dir": "models/distilgpt2"
 }

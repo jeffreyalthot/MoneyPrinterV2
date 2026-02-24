@@ -9,6 +9,9 @@ All your configurations will be in a file in the root directory, called `config.
 - `headless`: `boolean` - If `true`, the application will run in headless mode. This means that the browser will not be visible.
 - `offline_mode`: `boolean` - If `true`, runs in local mode without AI APIs (local text/image/subtitle generation + TTS fallback).
 - `binary_free_mode`: `boolean` - If `true`, avoids external binaries (FFmpeg/ImageMagick) and exports a GIF slideshow (no audio track).
+- `local_ai_provider`: `string` - Local AI backend when `offline_mode=true`: `template` (ultra-light fallback) or `hf_transformers` (local Hugging Face model).
+- `local_hf_model_id`: `string` - Hugging Face model id used for local text generation (example: `distilgpt2`).
+- `local_hf_model_dir`: `string` - Local folder where the downloaded HF model is stored (example: `models/distilgpt2`).
 - `llm`: This will decide the Large Language Model MPV2 uses to generate tweets, scripts, image prompts and more. If left empty, the default model (`gpt35_turbo`) will be used. Here are your choices:
     * `gpt4`
     * `gpt35_turbo`
@@ -60,6 +63,9 @@ All your configurations will be in a file in the root directory, called `config.
   "headless": false,
   "offline_mode": true,
   "binary_free_mode": false,
+  "local_ai_provider": "template",
+  "local_hf_model_id": "distilgpt2",
+  "local_hf_model_dir": "models/distilgpt2",
   "twitter_language": "English",
   "llm": "gpt4",
   "image_prompt_llm": "gpt35_turbo",
@@ -80,7 +86,6 @@ All your configurations will be in a file in the root directory, called `config.
   "outreach_message_body_file": "outreach_message.html",
   "assembly_ai_api_key": "",
   "font": "bold_font.ttf",
-  "imagemagick_path": "C:\\Program Files\\ImageMagick-7.1.0-Q16\\magick.exe",
-  "binary_free_mode": false
+  "imagemagick_path": "C:\\Program Files\\ImageMagick-7.1.0-Q16\\magick.exe"
 }
 ```

@@ -6,7 +6,7 @@ prettytable
 webdriver_manager
 selenium
 g4f
-moviepy
+moviepy<2
 imageio-ffmpeg
 Pillow==9.5.0
 yagmail
@@ -14,3 +14,5 @@ assemblyai
 srt_equalizer
 undetected_chromedriver
 platformdirs
+huggingface_hub
+transformers

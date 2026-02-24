@@ -5,14 +5,88 @@ import math
 import struct
 from uuid import uuid4
 from typing import List
+from importlib import import_module
+from importlib.util import find_spec
 
 from PIL import Image, ImageDraw, ImageFont
 
-from config import ROOT_DIR, get_font, get_fonts_dir
+from config import (
+    ROOT_DIR,
+    get_font,
+    get_fonts_dir,
+    get_local_ai_provider,
+    get_local_hf_model_dir,
+    get_local_hf_model_id,
+)
+
+_HF_PIPELINE = None
+_HF_DISABLED = False
+
+
+def _load_hf_pipeline():
+    global _HF_PIPELINE, _HF_DISABLED
+
+    if _HF_PIPELINE is not None or _HF_DISABLED:
+        return _HF_PIPELINE
+
+    if get_local_ai_provider() != "hf_transformers":
+        return None
+
+    if find_spec("transformers") is None or find_spec("torch") is None:
+        _HF_DISABLED = True
+        return None
+
+    transformers = import_module("transformers")
+
+    model_dir = get_local_hf_model_dir()
+    model_id = get_local_hf_model_id()
+    selected_model = model_dir if os.path.isdir(model_dir) else model_id
+
+    try:
+        _HF_PIPELINE = transformers.pipeline(
+            "text-generation",
+            model=selected_model,
+            tokenizer=selected_model,
+            device=-1,
+        )
+    except Exception:
+        _HF_DISABLED = True
+        return None
+
+    return _HF_PIPELINE
+
+
+def _hf_generate(prompt: str, max_new_tokens: int = 90) -> str:
+    pipe = _load_hf_pipeline()
+    if pipe is None:
+        return ""
+
+    try:
+        out = pipe(
+            prompt,
+            max_new_tokens=max_new_tokens,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.9,
+            num_return_sequences=1,
+            pad_token_id=pipe.tokenizer.eos_token_id,
+        )
+    except Exception:
+        return ""
+
+    if not out:
+        return ""
+
+    raw = out[0].get("generated_text", "")
+    return raw[len(prompt):].strip() if raw.startswith(prompt) else raw.strip()
 
 
 def local_text_response(prompt: str, niche: str = "", language: str = "fr") -> str:
     """Retourne une réponse locale simple (sans API)."""
+    hf_response = _hf_generate(prompt, max_new_tokens=80)
+    if hf_response:
+        return hf_response
+
     low = prompt.lower()
 
     if "youtube video title" in low:
@@ -38,6 +112,14 @@ def local_text_response(prompt: str, niche: str = "", language: str = "fr") -> s
 
 
 def local_script(subject: str, sentence_count: int = 8, language: str = "fr") -> str:
+    hf_prompt = (
+        f"Écris un script vidéo court en {language} sur: {subject}. "
+        f"Donne exactement {sentence_count} phrases courtes."
+    )
+    hf_script = _hf_generate(hf_prompt, max_new_tokens=140)
+    if hf_script:
+        return hf_script
+
     base = [
         f"Aujourd'hui on parle de {subject}.",
         "Commence par définir un objectif simple et mesurable.",
