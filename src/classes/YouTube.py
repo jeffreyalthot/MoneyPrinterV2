@@ -1,6 +1,5 @@
 import re
 import os
-import shutil
 import math
 try:
     import g4f
@@ -24,28 +23,15 @@ from constants import *
 from local_ai import local_text_response, local_script, generate_local_image, generate_local_subtitles
 from typing import List, Optional
 from PIL import Image, ImageOps
-
-def resolve_ffmpeg_path() -> Optional[str]:
-    """Resolve FFmpeg path for environments where PATH lookup is unreliable."""
-    ffmpeg_candidates = [
-        os.getenv("IMAGEIO_FFMPEG_EXE"),
-        shutil.which("ffmpeg"),
-        "/data/user/0/ru.iiec.pydroid3/files/usr/bin/ffmpeg",
-        "/data/user/0/ru.iiec.pydroid3/files/home/bin/ffmpeg",
-        "/data/data/com.termux/files/usr/bin/ffmpeg",
-    ]
-    return next((path for path in ffmpeg_candidates if path and os.path.isfile(path)), None)
+from imageio_ffmpeg import get_ffmpeg_exe
 
 
-def ensure_ffmpeg_available() -> str:
-    """Ensure FFmpeg path is configured before video rendering."""
-    ffmpeg_path = resolve_ffmpeg_path()
-    if not ffmpeg_path:
-        raise RuntimeError(
-            "FFmpeg is required by MoviePy but was not found on this device. "
-            "Install FFmpeg first (on Pydroid 3: run `pkg install ffmpeg` in the terminal plugin), "
-            "or set IMAGEIO_FFMPEG_EXE to the absolute ffmpeg binary path."
-        )
+def ensure_ffmpeg_available() -> Optional[str]:
+    """Configure MoviePy with bundled FFmpeg when available."""
+    try:
+        ffmpeg_path = get_ffmpeg_exe()
+    except Exception:
+        return None
 
     os.environ["IMAGEIO_FFMPEG_EXE"] = ffmpeg_path
     return ffmpeg_path
@@ -544,11 +530,10 @@ class YouTube:
         Returns:
             path (str): The path to the generated MP4 File.
         """
-        ffmpeg_path = resolve_ffmpeg_path()
+        ffmpeg_path = ensure_ffmpeg_available()
         if get_binary_free_mode() or not ffmpeg_path:
             return self.combine_binary_free()
 
-        os.environ["IMAGEIO_FFMPEG_EXE"] = ensure_ffmpeg_available()
         combined_image_path = os.path.join(ROOT_DIR, ".mp", str(uuid4()) + ".mp4")
         threads = get_threads()
         tts_clip = AudioFileClip(self.tts_path)

@@ -7,6 +7,7 @@ webdriver_manager
 selenium
 g4f
 moviepy
+imageio-ffmpeg
 Pillow==9.5.0
 yagmail
 assemblyai
