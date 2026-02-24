@@ -594,10 +594,21 @@ class YouTube:
         # Equalize srt file
         equalize_subtitles(subtitles_path, 10)
         
-        # Burn the subtitles into the video
-        subtitles = SubtitlesClip(subtitles_path, generator)
-
-        subtitles.set_pos(("center", "center"))
+        subtitles = None
+        # Burn subtitles when TextClip backend is available.
+        # On Windows, MoviePy may fail if ImageMagick isn't installed/configured.
+        try:
+            subtitles = SubtitlesClip(subtitles_path, generator)
+            subtitles = subtitles.set_pos(("center", "center"))
+        except (OSError, FileNotFoundError) as error:
+            print(
+                colored(
+                    "[!] Could not render subtitles with MoviePy/TextClip. "
+                    "Continuing without burned subtitles. "
+                    f"Details: {error}",
+                    "yellow",
+                )
+            )
         random_song_clip = AudioFileClip(random_song).set_fps(44100)
 
         # Turn down volume
@@ -610,11 +621,12 @@ class YouTube:
         final_clip = final_clip.set_audio(comp_audio)
         final_clip = final_clip.set_duration(tts_clip.duration)
 
-        # Add subtitles
-        final_clip = CompositeVideoClip([
-            final_clip,
-            subtitles
-        ])
+        # Add subtitles (if available)
+        if subtitles:
+            final_clip = CompositeVideoClip([
+                final_clip,
+                subtitles,
+            ])
 
         final_clip.write_videofile(combined_image_path, threads=threads)
 
